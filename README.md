@@ -38,6 +38,7 @@ dfo = tracc.supply(
     columns = ["block_group_id","C000"] # C000 pertains to the total number of jobs
     )
 
+
 # Loading in travel costs.
 # For this example, travel times by transit between block groups in Boston at 8am on June 30, 2020.
 dft = tracc.costs(
@@ -46,6 +47,7 @@ dft = tracc.costs(
     compression='zip')
     )
 dft.data.time = dft.data.time / 60 # converting time from seconds to minutes
+
 
 # Computing impedance function based on a 45 minute travel time threshold.
 dft.impedence_calc(
@@ -56,6 +58,7 @@ dft.impedence_calc(
     prune_output = False
 )
 
+
 # Setting up the accessibility object.
 # This includes joining the destination data to the travel time data.
 acc = tracc.accessibility(
@@ -65,6 +68,7 @@ acc = tracc.accessibility(
     supply_ids = "block_group_id"
     )
 
+
 # Computing accessibility to jobs based on the 45-min threshold.
 dfa = acc.potential(
     opportunity = "C000",
@@ -72,10 +76,10 @@ dfa = acc.potential(
     )
 ```
 
-Here's the `dfa.head()` of the result (e.g. from block group `250056001001` someone can reach 4061 jobs in a 45 minute transit trip)
+Here's the top five rows of `dfa` (e.g. from block group `250056001001` someone can reach 4,061 jobs in a 45 minute transit trip)
 
 ```
-    o_block 	    A_C000_fCij_c45
+    o_block       A_C000_fCij_c45
 ---------------------------------
 0 	250056001001 	4061.0
 1 	250056001002 	3960.0
