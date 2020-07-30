@@ -22,26 +22,32 @@ Planned future functionality will include competitive (i.e. floating catchment) 
 
 ## Installation
 
+```
+pip install tracc
+```
+
 Requirements are [pandas](https://github.com/pandas-dev/pandas), [numpy](https://github.com/numpy/numpy), [geopandas](https://github.com/geopandas/geopandas), [libpysal](https://github.com/pysal/libpysal)
 
 ## Basic Usage
 
 ```Python
-# loading in destination data
-# for this example, these are job counts by block group from the the LEHD for Boston
+# Loading in destination data.
+# For this example, these are job counts by block group from the the LEHD for Boston.
 dfo = tracc.supply(
     supply_df =pd.read_csv("examples/test_data/boston/destination_employment_lehd.csv")
     columns = ["block_group_id","C000"] # C000 pertains to the total number of jobs
     )
 
-# loading in travel costs
-# for this example, travel times by transit between block groups in Boston at 8am on June 30, 2020
+# Loading in travel costs.
+# For this example, travel times by transit between block groups in Boston at 8am on June 30, 2020.
 dft = tracc.costs(
-    pd.read_csv("examples/test_data/boston/transit_time_matrix_8am_30_06_2020.zip", compression='zip')
+    pd.read_csv(
+    "examples/test_data/boston/transit_time_matrix_8am_30_06_2020.zip",
+    compression='zip')
     )
 dft.data.time = dft.data.time / 60 # converting time from seconds to minutes
 
-# Computing impedance function based on a 45 minute travel time threshold
+# Computing impedance function based on a 45 minute travel time threshold.
 dft.impedence_calc(
     cost_column = "time",
     impedence_func = "cumulative",
@@ -50,7 +56,8 @@ dft.impedence_calc(
     prune_output = False
 )
 
-# Setting up the accessibility object. This includes joining the destination data to the travel time data
+# Setting up the accessibility object.
+# This includes joining the destination data to the travel time data.
 acc = tracc.accessibility(
     travelcosts_df = dft.data,
     supply_df = dfo.data,
@@ -58,7 +65,7 @@ acc = tracc.accessibility(
     supply_ids = "block_group_id"
     )
 
-# measruing accessibility
+# Computing accessibility to jobs based on the 45-min threshold.
 dfa = acc.potential(
     opportunity = "C000",
     impedence = "fCij_c45"

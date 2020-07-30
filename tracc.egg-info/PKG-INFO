@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: tracc
+Version: 0.0.1
+Summary: Transport accessibility measures in Python
+Home-page: https://github.com/jamaps/tracc
+Author: Jeff Allen
+Author-email: jeff.allen@utoronto.ca
+License: UNKNOWN
+Description: Transport accessibility measures in Python
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown

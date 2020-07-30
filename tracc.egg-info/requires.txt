@@ -1,0 +1,4 @@
+pandas>=1.0
+numpy>=1.18.5
+geopandas>=0.7.0
+libpysal>=4.3.0
