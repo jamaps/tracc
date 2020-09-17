@@ -101,3 +101,5 @@ bg.plot(column='A_C000_fCij_c45', figsize=(8, 8), scheme='quantiles', legend=Tru
 ## Examples
 
 - [Basic usage example](examples/basic_accessibility_example.ipynb)
+
+- [Intrazonal travel times and spatial smoothing](examples/intrazonal_times_and_spatial_smoothing.ipynb)

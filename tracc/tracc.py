@@ -2,6 +2,7 @@ import tracc
 import pandas as pd
 import numpy as np
 
+
 class costs:
 
     def __init__(self,
@@ -94,8 +95,6 @@ class costs:
 
 
 
-
-
     def fill_missing_costs(
         self,
         cost_column,
@@ -106,6 +105,9 @@ class costs:
         where = "origin",
         weight_type = "Queen"
         ):
+        """
+        Completes an OD matrix by filling locations that were missing from the original matrix, based on a neighbourhood spatial weights matrix. For example if a origin zone has no travel costs, it presumes its travel costs to destinations are the average of the same costs of its neighbouring zones.
+        """
 
         from tracc.spatial import area
 
@@ -120,8 +122,6 @@ class costs:
 
         if len(missing) == 0:
             return None
-
-
 
         if where == "origin":
 
@@ -253,7 +253,7 @@ class costs:
         """
         If there are multiple impedences, and we want to combine them into a single impedence value. This is similar to genearlized cost.
 
-        For example, if we have an impedence value for transit travel time, and we want to remove any trips based on a fare criteria, it can be applied in this way.
+        For example, if we have an impedence value for transit travel time, and we also want to remove any trips based on a fare criteria, it can be applied in this way.
         """
 
         if how == "product":

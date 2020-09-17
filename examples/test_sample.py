@@ -4,11 +4,16 @@
 # test all flow for larger dataset
 
 
+import sys
+sys.path.append("..")
 
 
 import tracc
 import pandas as pd
 import numpy as np
+
+import time
+
 
 # # dfc = pd.read_csv("tests/Boston8AM.csv")
 # # dfo = pd.read_csv("tests/destination_employment_lehd.csv")
@@ -160,7 +165,17 @@ dft = tracc.costs(
 dft.data.time = dft.data.time / 60 # converting time from seconds to minutes
 dft.data.time = dft.data.time.round(1) # rounding to just one decimal place
 
+dft.intrazonal(
+    cost_column = "time",
+    origin_column = "o_block",
+    destination_column = "d_block",
+    method = "constant",
+    value = 0
+)
 
+print(dft.data)
+
+# dft.data = dft.data[dft.data["time"] > 0]
 #
 # dft.fill_missing_costs(
 #     where = "origin",
@@ -180,6 +195,16 @@ dft.data.time = dft.data.time.round(1) # rounding to just one decimal place
 #     spatial_file_id = "GEOID"
 # )
 
+# print(dft.data[dft.data["o_block"] == '250277261005'])
+
+
+# print(dft.data[dft.data["o_block"] == '250173632022'])
+# print(dft.data[dft.data["o_block"] == '250173231002'])
+# print(dft.data[dft.data["o_block"] == '250173632013'])
+
+start_time = time.time()
+
+
 dft.intrazonal(
     cost_column = "time",
     origin_column = "o_block",
@@ -190,27 +215,32 @@ dft.intrazonal(
     polygon_id = "GEOID"
 )
 
-
-dft.impedence_calc(
-    cost_column = "time",
-    impedence_func = "cumulative",
-    impedence_func_params = 45,
-    output_col_name = "fCij_c45",
-    prune_output = False
-)
+print(time.time() - start_time)
 
 
-acc = tracc.accessibility(
-        travelcosts_df = dft.data,
-        supply_df = dfo.data,
-        travelcosts_ids = ["o_block","d_block"],
-        supply_ids = "block_group_id"
-    )
+# print(dft.data)
 
-dfa = acc.potential(
-        opportunity = "C000",
-        impedence = "fCij_c45"
-        )
 
-print(dfa)
-dfa.to_csv("test_data_nofill.csv")
+# dft.impedence_calc(
+#     cost_column = "time",
+#     impedence_func = "cumulative",
+#     impedence_func_params = 45,
+#     output_col_name = "fCij_c45",
+#     prune_output = False
+# )
+#
+#
+# acc = tracc.accessibility(
+#         travelcosts_df = dft.data,
+#         supply_df = dfo.data,
+#         travelcosts_ids = ["o_block","d_block"],
+#         supply_ids = "block_group_id"
+#     )
+#
+# dfa = acc.potential(
+#         opportunity = "C000",
+#         impedence = "fCij_c45"
+#         )
+#
+# print(dfa)
+# dfa.to_csv("test_data_nofill.csv")
