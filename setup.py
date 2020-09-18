@@ -4,8 +4,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="tracc", 
-    version="0.0.1",
+    name="tracc",
+    version="0.0.2",
     author="Jeff Allen",
     author_email="jeff.allen@utoronto.ca",
     description="Transport accessibility measures in Python",
@@ -26,3 +26,5 @@ setuptools.setup(
         "libpysal>=4.3.0"
     ]
 )
+
+# https://packaging.python.org/tutorials/packaging-projects/
