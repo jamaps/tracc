@@ -145,81 +145,91 @@ import time
 # print(test)
 #
 # #
-dfo = pd.merge(
-        pd.read_csv("test_data/boston/destination_employment_lehd.csv"),
-        pd.read_csv("test_data/boston/destination_groceries_snap.csv"),
-        how = "outer",
-        left_on = "block_group_id",
-        right_on = "GEOID"
-)
-
-dfo = tracc.supply(
-    supply_df = dfo,
-    columns = ["block_group_id","C000","snap"]
-    )
-
-
-dft = tracc.costs(
-    pd.read_csv("test_data/boston/transit_time_matrix_8am_30_06_2020.zip", compression='zip')
-    )
-dft.data.time = dft.data.time / 60 # converting time from seconds to minutes
-dft.data.time = dft.data.time.round(1) # rounding to just one decimal place
-
-dft.intrazonal(
-    cost_column = "time",
-    origin_column = "o_block",
-    destination_column = "d_block",
-    method = "constant",
-    value = 0
-)
-
-print(dft.data)
-
-# dft.data = dft.data[dft.data["time"] > 0]
+# dfo = pd.merge(
+#         pd.read_csv("test_data/boston/destination_employment_lehd.csv"),
+#         pd.read_csv("test_data/boston/destination_groceries_snap.csv"),
+#         how = "outer",
+#         left_on = "block_group_id",
+#         right_on = "GEOID"
+# )
 #
-# dft.fill_missing_costs(
-#     where = "origin",
+# dfo = tracc.supply(
+#     supply_df = dfo,
+#     columns = ["block_group_id","C000","snap"]
+#     )
+#
+#
+# dft = tracc.costs(
+#     pd.read_csv("test_data/boston/transit_time_matrix_8am_30_06_2020.zip", compression='zip')
+#     )
+# dft.data.time = dft.data.time / 60 # converting time from seconds to minutes
+# dft.data.time = dft.data.time.round(1) # rounding to just one decimal place
+#
+# dft.intrazonal(
 #     cost_column = "time",
 #     origin_column = "o_block",
 #     destination_column = "d_block",
-#     spatial_file_path = "test_data/boston/block_group_poly.geojson",
-#     spatial_file_id = "GEOID"
+#     method = "constant",
+#     value = 0
 # )
 #
-# dft.fill_missing_costs(
-#     where = "destination",
-#     cost_column = "time",
-#     origin_column = "o_block",
-#     destination_column = "d_block",
-#     spatial_file_path = "test_data/boston/block_group_poly.geojson",
-#     spatial_file_id = "GEOID"
-# )
-
-# print(dft.data[dft.data["o_block"] == '250277261005'])
-
-
-# print(dft.data[dft.data["o_block"] == '250173632022'])
-# print(dft.data[dft.data["o_block"] == '250173231002'])
-# print(dft.data[dft.data["o_block"] == '250173632013'])
-
-start_time = time.time()
-
-
-dft.intrazonal(
-    cost_column = "time",
-    origin_column = "o_block",
-    destination_column = "d_block",
-    method = "radius",
-    value = 1 / 0.0833333333,
-    polygon_file = "test_data/boston/block_group_poly.geojson",
-    polygon_id = "GEOID"
-)
-
-print(time.time() - start_time)
-
-
 # print(dft.data)
+#
+# # dft.data = dft.data[dft.data["time"] > 0]
+# #
+# # dft.fill_missing_costs(
+# #     where = "origin",
+# #     cost_column = "time",
+# #     origin_column = "o_block",
+# #     destination_column = "d_block",
+# #     spatial_file_path = "test_data/boston/block_group_poly.geojson",
+# #     spatial_file_id = "GEOID"
+# # )
+# #
+# # dft.fill_missing_costs(
+# #     where = "destination",
+# #     cost_column = "time",
+# #     origin_column = "o_block",
+# #     destination_column = "d_block",
+# #     spatial_file_path = "test_data/boston/block_group_poly.geojson",
+# #     spatial_file_id = "GEOID"
+# # )
+#
+# # print(dft.data[dft.data["o_block"] == '250277261005'])
+#
+#
+# # print(dft.data[dft.data["o_block"] == '250173632022'])
+# # print(dft.data[dft.data["o_block"] == '250173231002'])
+# # print(dft.data[dft.data["o_block"] == '250173632013'])
+#
+# start_time = time.time()
+#
+#
+# dft.intrazonal(
+#     cost_column = "time",
+#     origin_column = "o_block",
+#     destination_column = "d_block",
+#     method = "radius",
+#     value = 1 / 0.0833333333,
+#     polygon_file = "test_data/boston/block_group_poly.geojson",
+#     polygon_id = "GEOID"
+# )
+#
+# print(time.time() - start_time)
+#
+#
+# # print(dft.data)
 
+
+from tracc.spatial import get_neighbours
+
+n = get_neighbours(
+    spatial_data_file_path = "test_data/boston/block_group_poly.geojson",
+    weight_type = "KNN",
+    idVariable = "GEOID",
+    param = 3
+)
+print(n)
 
 # dft.impedence_calc(
 #     cost_column = "time",
@@ -228,19 +238,28 @@ print(time.time() - start_time)
 #     output_col_name = "fCij_c45",
 #     prune_output = False
 # )
-#
-#
+# #
+# #
 # acc = tracc.accessibility(
 #         travelcosts_df = dft.data,
 #         supply_df = dfo.data,
 #         travelcosts_ids = ["o_block","d_block"],
 #         supply_ids = "block_group_id"
 #     )
-#
+# #
 # dfa = acc.potential(
 #         opportunity = "C000",
 #         impedence = "fCij_c45"
 #         )
 #
+# print(dfa)
+#
+# dfa = acc.mintravelcost(
+#     travelcost = "time",
+#     opportunity = "C000",
+#     min_n = 50000,
+#     output_col_name = "meow"
+# )
+# #
 # print(dfa)
 # dfa.to_csv("test_data_nofill.csv")

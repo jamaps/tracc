@@ -26,12 +26,21 @@ def area(spatial_data_file_path, id_field):
     gdf = gdf[[id_field,"area"]]
     return gdf
 
-def get_neighbours(spatial_data_file_path, weight_type, ids):
+def get_neighbours(spatial_data_file_path, weight_type, idVariable, param = None):
 
     gdf = gpd.read_file(spatial_data_file_path)
 
     if weight_type == "Queen":
 
-        w = libpysal.weights.Queen.from_dataframe(gdf,idVariable = "GEOID")
+        w = libpysal.weights.Queen.from_dataframe(gdf,ids = idVariable)
+
+    if weight_type == "KNN":
+
+        if param is None:
+            kn = 5
+        else:
+            kn = param
+
+        w = libpysal.weights.KNN.from_dataframe(gdf,ids = idVariable, k = kn)
 
     return w.neighbors
