@@ -1,5 +1,7 @@
 # data directory
 tracc/__pycache__/
 examples/.ipynb_checkpoints/
-
+dist/
+build/
+tracc.egg-info/
 # files

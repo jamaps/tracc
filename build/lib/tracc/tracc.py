@@ -2,6 +2,7 @@ import tracc
 import pandas as pd
 import numpy as np
 
+
 class costs:
 
     def __init__(self,
@@ -94,8 +95,6 @@ class costs:
 
 
 
-
-
     def fill_missing_costs(
         self,
         cost_column,
@@ -106,6 +105,9 @@ class costs:
         where = "origin",
         weight_type = "Queen"
         ):
+        """
+        Completes an OD matrix by filling locations that were missing from the original matrix, based on a neighbourhood spatial weights matrix. For example if a origin zone has no travel costs, it presumes its travel costs to destinations are the average of the same costs of its neighbouring zones.
+        """
 
         from tracc.spatial import area
 
@@ -120,8 +122,6 @@ class costs:
 
         if len(missing) == 0:
             return None
-
-
 
         if where == "origin":
 
@@ -253,7 +253,7 @@ class costs:
         """
         If there are multiple impedences, and we want to combine them into a single impedence value. This is similar to genearlized cost.
 
-        For example, if we have an impedence value for transit travel time, and we want to remove any trips based on a fare criteria, it can be applied in this way.
+        For example, if we have an impedence value for transit travel time, and we also want to remove any trips based on a fare criteria, it can be applied in this way.
         """
 
         if how == "product":
@@ -488,7 +488,7 @@ class accessibility:
             )
 
 
-    def potential(self, opportunity, impedence):
+    def potential(self, opportunity, impedence, output_col_name = None):
         """
         Measures potential accessibility to destinations
 
@@ -496,18 +496,9 @@ class accessibility:
         ----------
         opportunity : a string indicating the column name for which opportunity we are measuring access to (e.g. jobs, grocery stores, etc.). This column should be in the supply_df dataframe
 
-        travelcost : a string indicating the column name for which travel cost shall be used (e.g. travel time, monetary cost, etc.). This column should be in the travelcosts_df dataframe
+        impedence : column from the travel costs object to weight opportunities by
 
-        impedence_func : a string indicating which impedence (i.e. distance decay) function to use for mesauring accessibility
-
-        impedence_func_params : an int or list of the parameters
-
-        impedence_func | impedence_func_params
-        "cumulative" | threshold (int)
-        "linear" | [slope, intercept] (list with int)
-        "neg_exp" | beta (int)
-
-        time_period : an option paramater indicating a column in the cost table pertaining to whether the QQQQQQ
+        output_col_name : a string for the column name of the output accessibility measure
 
 
         Output
@@ -517,7 +508,10 @@ class accessibility:
         """
 
         # set the output name for the accessibility measure
-        A_col_name = "A_" + opportunity + "_" + impedence
+        if output_col_name is None:
+            A_col_name = "A_" + opportunity + "_" + impedence
+        else:
+            A_col_name = output_col_name
 
         # multiply the opportunity by the impedence
         self.data[A_col_name] = self.data[opportunity] * self.data[impedence]
@@ -532,10 +526,31 @@ class accessibility:
 
 
 
-    def passive(self, population, impedence):
+    def passive(self, population, impedence, output_col_name = None):
+
+        """
+        Measures passive accessibility to destinations
+
+        Parameters
+        ----------
+        population : a string indicating the column name for which population we are measuring access to (e.g. overall population, employed population, etc.). This column should be in the demand_df dataframe
+
+        impedence : column from the travel costs object to weight opportunities by
+
+        output_col_name : a string for the column name of the output accessibility measure
+
+
+        Output
+        ----------
+        A pandas dataframe with the first column with the IDs of the origin point (self.travelcosts_ids[0]), and the second column accessibility measures based on the input parameters.
+
+        """
 
         # set the output name for the accessibility measure
-        A_col_name = "A_" + population + "_" + impedence
+        if output_col_name is None:
+            A_col_name = "A_" + population + "_" + impedence
+        else:
+            A_col_name = output_col_name
 
         # multiply the opportunity by the impedence
         self.data[A_col_name] = self.data[population] * self.data[impedence]
@@ -550,7 +565,7 @@ class accessibility:
 
 
 
-    def mintravelcost(self, travelcost, opportunity, min_n):
+    def mintravelcost(self, travelcost, opportunity, min_n,  output_col_name = None):
         """
         Parameters
         ----------
@@ -560,10 +575,20 @@ class accessibility:
 
         min_n : an int indicating the number of desired reachable opportunities (e.g. 1 library, 3 grocery stores, 10k jobs, etc.)
 
+        output_col_name : a string for the column name of the output accessibility measure
+
+
+
         Output
         ---------
         A pandas dataframe with the first column with the IDs of the origin point (self.travelcosts_ids[0]), and the second column are the accessibility measures based on the input parameters.
         """
+
+        # set the output name for the accessibility measure
+        if output_col_name is None:
+            A_col_name = "A_mintravelcost_" + str(travelcost) + "_" + str(opportunity) + "_" +  str(min_n)
+        else:
+            A_col_name = output_col_name
 
         # internal function of returning the min travel time for n opportunities
         def get_min(df, tc, o, n):
@@ -576,7 +601,7 @@ class accessibility:
         out =  pd.DataFrame(self.data.groupby(self.travelcosts_ids[0]).apply(get_min, tc = travelcost, o = opportunity, n = min_n))
 
         # setting the column name of the output
-        out.columns = ["A_mintravelcost_" + str(travelcost) + "_" + str(opportunity) + "_" +  str(min_n)]
+        out.columns = [A_col_name]
 
         return out
 
