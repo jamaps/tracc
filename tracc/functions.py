@@ -5,7 +5,7 @@ import pandas as pd
 class decay:
 
     def __init__(self):
-        None 
+        None
 
     def cumulative(cost, threshold):
 
@@ -85,7 +85,7 @@ class decay:
                 f = params[2] ** (params[0] * cost ** params[1])
 
         else:
-            f = math.exp(params * cost ** 2)
+            f = math.exp(params * cost)
 
         if f < lower_bound:
             f = lower_bound

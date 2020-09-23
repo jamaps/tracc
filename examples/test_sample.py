@@ -145,26 +145,49 @@ import time
 # print(test)
 #
 # #
-# dfo = pd.merge(
-#         pd.read_csv("test_data/boston/destination_employment_lehd.csv"),
-#         pd.read_csv("test_data/boston/destination_groceries_snap.csv"),
-#         how = "outer",
-#         left_on = "block_group_id",
-#         right_on = "GEOID"
-# )
-#
-# dfo = tracc.supply(
-#     supply_df = dfo,
-#     columns = ["block_group_id","C000","snap"]
+dfo = pd.merge(
+        pd.read_csv("test_data/boston/destination_employment_lehd.csv"),
+        pd.read_csv("test_data/boston/destination_groceries_snap.csv"),
+        how = "outer",
+        left_on = "block_group_id",
+        right_on = "GEOID"
+)
+
+dfo = tracc.supply(
+    supply_df = dfo,
+    columns = ["block_group_id","C000","snap"]
+    )
+
+
+dft = tracc.costs(
+    pd.read_csv("test_data/boston/transit_time_matrix_8am_30_06_2020.zip", compression='zip')
+    )
+dft.data.time = dft.data.time / 60 # converting time from seconds to minutes
+dft.data.time = dft.data.time.round(1) # rounding to just one decimal place
+
+dft.impedence_calc(
+    cost_column = "time",
+    impedence_func ="exponential",
+    impedence_func_params = -0.05,
+    output_col_name = "fCij_time"
+    )
+
+print(dft.data)
+
+# acc = tracc.accessibility(
+#         travelcosts_df = dft.data,
+#         supply_df = dfo.data,
+#         travelcosts_ids = ["o_block","d_block"],
+#         supply_ids = "block_group_id"
 #     )
-#
-#
-# dft = tracc.costs(
-#     pd.read_csv("test_data/boston/transit_time_matrix_8am_30_06_2020.zip", compression='zip')
-#     )
-# dft.data.time = dft.data.time / 60 # converting time from seconds to minutes
-# dft.data.time = dft.data.time.round(1) # rounding to just one decimal place
-#
+
+
+
+
+
+
+
+
 # dft.intrazonal(
 #     cost_column = "time",
 #     origin_column = "o_block",
@@ -221,15 +244,15 @@ import time
 # # print(dft.data)
 
 
-from tracc.spatial import get_neighbours
-
-n = get_neighbours(
-    spatial_data_file_path = "test_data/boston/block_group_poly.geojson",
-    weight_type = "KNN",
-    idVariable = "GEOID",
-    param = 3
-)
-print(n)
+# from tracc.spatial import get_neighbours
+#
+# n = get_neighbours(
+#     spatial_data_file_path = "test_data/boston/block_group_poly.geojson",
+#     weight_type = "KNN",
+#     idVariable = "GEOID",
+#     param = 3
+# )
+# print(n)
 
 # dft.impedence_calc(
 #     cost_column = "time",
@@ -240,12 +263,7 @@ print(n)
 # )
 # #
 # #
-# acc = tracc.accessibility(
-#         travelcosts_df = dft.data,
-#         supply_df = dfo.data,
-#         travelcosts_ids = ["o_block","d_block"],
-#         supply_ids = "block_group_id"
-#     )
+
 # #
 # dfa = acc.potential(
 #         opportunity = "C000",

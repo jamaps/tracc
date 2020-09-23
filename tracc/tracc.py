@@ -217,7 +217,7 @@ class costs:
         cost_column,
         impedence_func,
         impedence_func_params,
-        prune_output = True,
+        prune_output = False,
         output_col_name = "fCij"
         ):
 
@@ -233,8 +233,8 @@ class costs:
         elif impedence_func == "linear":
             self.data[output_col_name] = self.data[cost_column].apply(tracc.decay.linear,args = (impedence_func_params,))
 
-        elif impedence_func == "neg_exp":
-            self.data[output_col_name] = self.data[cost_column].apply(tracc.decay.neg_exp,args = (impedence_func_params,))
+        elif impedence_func == "exponential":
+            self.data[output_col_name] = self.data[cost_column].apply(tracc.decay.exponential,args = (impedence_func_params,))
 
         else:
             raise Exception("Please select an appropriate decay function")
