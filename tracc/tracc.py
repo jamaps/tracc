@@ -565,7 +565,7 @@ class accessibility:
 
 
 
-    def mintravelcost(self, travelcost, opportunity, min_n,  output_col_name = None):
+    def mintravelcost(self, travelcost, opportunity, min_n,  output_col_name = None, fill_na_value = None):
         """
         Parameters
         ----------
@@ -602,6 +602,14 @@ class accessibility:
 
         # setting the column name of the output
         out.columns = [A_col_name]
+
+        if fill_na_value is not None:
+            out.fillna(fill_na_value, inplace=True)
+        #
+        #
+
+        out.index.name = self.supply_ids
+        out.reset_index(inplace=True)
 
         return out
 

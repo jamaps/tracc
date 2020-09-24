@@ -153,6 +153,8 @@ dfo = pd.merge(
         right_on = "GEOID"
 )
 
+dfo.fillna(0, inplace=True)
+
 dfo = tracc.supply(
     supply_df = dfo,
     columns = ["block_group_id","C000","snap"]
@@ -172,51 +174,70 @@ dft.impedence_calc(
     output_col_name = "fCij_time"
     )
 
-print(dft.data)
+dft.intrazonal(
+    cost_column = "time",
+    origin_column = "o_block",
+    destination_column = "d_block",
+    method = "constant",
+    value = -1
+)
 
-# acc = tracc.accessibility(
-#         travelcosts_df = dft.data,
-#         supply_df = dfo.data,
-#         travelcosts_ids = ["o_block","d_block"],
-#         supply_ids = "block_group_id"
-#     )
+dft.data = dft.data[dft.data["time"] > -1]
+
+dft.fill_missing_costs(
+    where = "origin",
+    cost_column = "time",
+    origin_column = "o_block",
+    destination_column = "d_block",
+    spatial_file_path = "test_data/boston/block_group_poly.geojson",
+    spatial_file_id = "GEOID"
+)
+
+dft.fill_missing_costs(
+    where = "destination",
+    cost_column = "time",
+    origin_column = "o_block",
+    destination_column = "d_block",
+    spatial_file_path = "test_data/boston/block_group_poly.geojson",
+    spatial_file_id = "GEOID"
+)
+
+dft.intrazonal(
+    cost_column = "time",
+    origin_column = "o_block",
+    destination_column = "d_block",
+    method = "radius",
+    value = 1 / 0.0833333333,
+    polygon_file = "test_data/boston/block_group_poly.geojson",
+    polygon_id = "GEOID"
+)
+
+acc = tracc.accessibility(
+        travelcosts_df = dft.data,
+        supply_df = dfo.data,
+        travelcosts_ids = ["o_block","d_block"],
+        supply_ids = "block_group_id"
+    )
+
+print(dfo.data)
+
+dfa = acc.mintravelcost(
+    travelcost = "time",
+    opportunity = "snap",
+    min_n = 3,
+    output_col_name = "snap3",
+    fill_na_value = 999
+)
+
+print(dfa)
 
 
 
 
-
-
-
-
-# dft.intrazonal(
-#     cost_column = "time",
-#     origin_column = "o_block",
-#     destination_column = "d_block",
-#     method = "constant",
-#     value = 0
-# )
 #
 # print(dft.data)
 #
-# # dft.data = dft.data[dft.data["time"] > 0]
-# #
-# # dft.fill_missing_costs(
-# #     where = "origin",
-# #     cost_column = "time",
-# #     origin_column = "o_block",
-# #     destination_column = "d_block",
-# #     spatial_file_path = "test_data/boston/block_group_poly.geojson",
-# #     spatial_file_id = "GEOID"
-# # )
-# #
-# # dft.fill_missing_costs(
-# #     where = "destination",
-# #     cost_column = "time",
-# #     origin_column = "o_block",
-# #     destination_column = "d_block",
-# #     spatial_file_path = "test_data/boston/block_group_poly.geojson",
-# #     spatial_file_id = "GEOID"
-# # )
+
 #
 # # print(dft.data[dft.data["o_block"] == '250277261005'])
 #
@@ -228,15 +249,7 @@ print(dft.data)
 # start_time = time.time()
 #
 #
-# dft.intrazonal(
-#     cost_column = "time",
-#     origin_column = "o_block",
-#     destination_column = "d_block",
-#     method = "radius",
-#     value = 1 / 0.0833333333,
-#     polygon_file = "test_data/boston/block_group_poly.geojson",
-#     polygon_id = "GEOID"
-# )
+
 #
 # print(time.time() - start_time)
 #
@@ -272,12 +285,7 @@ print(dft.data)
 #
 # print(dfa)
 #
-# dfa = acc.mintravelcost(
-#     travelcost = "time",
-#     opportunity = "C000",
-#     min_n = 50000,
-#     output_col_name = "meow"
-# )
+
 # #
 # print(dfa)
 # dfa.to_csv("test_data_nofill.csv")

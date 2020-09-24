@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="tracc",
-    version="0.0.2",
+    version="0.0.3",
     author="Jeff Allen",
     author_email="jeff.allen@utoronto.ca",
     description="Transport accessibility measures in Python",
